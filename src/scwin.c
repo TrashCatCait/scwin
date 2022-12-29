@@ -55,6 +55,19 @@ void scwin_set_key_press_fn(scwin_ptr window, void *fn) {
 	window->key_event = fn;
 }
 
+void scwin_set_draw_fn(scwin_ptr window, void *fn) {
+	window->draw_event = fn;
+}
+
+
+EGLDisplay *scwin_create_egl_display(scwin_ptr window) {
+	return window->scwin_get_egl_display(window);
+}
+
+EGLSurface *scwin_create_egl_surface(EGLDisplay *display, EGLConfig config, scwin_ptr window, const EGLint *attrib_list) {
+	return window->scwin_create_egl_surface(display, config, window, attrib_list);
+}
+
 scwin_ptr scwin_create(scwin_req_ptr req) {
 	char *name = getenv("SCWIN_OVERRIDE");
 

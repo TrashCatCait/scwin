@@ -71,14 +71,26 @@ void scwin_xcb_client_message(scwin_xcb_ptr xcb, xcb_client_message_event_t *eve
 	}
 }
 
+/* 
+ * TODO all events
+ */
 void scwin_xcb_key_press(scwin_xcb_ptr xcb, xcb_key_press_event_t *event) {	
 	if(xcb->impl.key_event) {
 		xcb->impl.key_event();
 	}
 }
 
+void scwin_xcb_expose(scwin_xcb_ptr xcb, xcb_expose_event_t *event) {
+	if(xcb->impl.draw_event) {
+		xcb->impl.draw_event();
+	}
+}
+
 void scwin_xcb_event(scwin_xcb_ptr xcb, xcb_generic_event_t *event) {
 	switch (event->response_type & 0x7f) {
+		case XCB_EXPOSE:
+			scwin_xcb_expose(xcb, (void*)event);
+			break;
 		case XCB_KEY_PRESS: 
 			scwin_xcb_key_press(xcb, (void*)event);
 			break;
@@ -182,12 +194,11 @@ EGLDisplay *scwin_xcb_create_egl_display(scwin_ptr window) {
 	PFNEGLGETPLATFORMDISPLAYEXTPROC get_platform_display = NULL;
 	
 	get_platform_display = (void*)eglGetProcAddress("eglGetPlatformDisplayEXT");		
-
 	if(get_platform_display) {
 		display = get_platform_display(EGL_PLATFORM_XCB_EXT, xcb->connection, NULL);
 	}
 
-	return NULL;
+	return display;
 }
 
 EGLSurface *scwin_xcb_create_egl_surface(EGLDisplay *display, EGLConfig config, scwin_ptr window, const EGLint *attrib_list) {

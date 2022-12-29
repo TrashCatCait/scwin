@@ -27,6 +27,7 @@ void scwin_destroy(scwin_ptr window);
 void scwin_poll_events(scwin_ptr window);
 void scwin_map(scwin_ptr window);
 void scwin_set_key_press_fn(scwin_ptr window, void *fn);
+void scwin_set_draw_fn(scwin_ptr window, void *fn);	
 int scwin_should_close(scwin_ptr window);
 VkResult scwin_create_vksurface(VkInstance instance, scwin_ptr window, VkAllocationCallbacks allocator, VkSurfaceKHR *surface);
 EGLDisplay *scwin_create_egl_display(scwin_ptr window);

@@ -30,6 +30,7 @@ struct scwin {
 	void (*destroy)(scwin_ptr window);
 	void (*poll_event)(scwin_ptr window);
 	void (*key_event)();
+	void (*draw_event)();
 	EGLDisplay *(*scwin_get_egl_display)(scwin_ptr widnow);
 	EGLSurface *(*scwin_create_egl_surface)(EGLDisplay *display, EGLConfig config, scwin_ptr window, const EGLint *attrib_list);
 	VkResult (*scwin_create_vk_surface)(VkInstance instance, scwin_ptr window, VkAllocationCallbacks allocator, VkSurfaceKHR *surface);
