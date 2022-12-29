@@ -19,13 +19,20 @@
  */
 
 #include <stdint.h>
-typedef struct scwin scwin_t, *scwin_ptr;
+#include <scwin.h>
+#include <vulkan/vulkan.h>
+#include <EGL/egl.h>
 
 struct scwin {
+	int close;
+
 	void (*start)(scwin_ptr window);
 	void (*destroy)(scwin_ptr window);
 	void (*poll_event)(scwin_ptr window);
 	void (*key_event)();
+	EGLDisplay *(*scwin_get_egl_display)(scwin_ptr widnow);
+	EGLSurface *(*scwin_create_egl_surface)(EGLDisplay *display, EGLConfig config, scwin_ptr window, const EGLint *attrib_list);
+	VkResult (*scwin_create_vk_surface)(VkInstance instance, scwin_ptr window, VkAllocationCallbacks allocator, VkSurfaceKHR *surface);
 };
 
 

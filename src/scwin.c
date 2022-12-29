@@ -1,10 +1,11 @@
+#define DISABLE_PRIVSCWIN_WARN
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <private_scwin.h>
 #include <scwin.h>
+#include <backends/xcb/xcb.h>
 
-
-#define DISABLE_PRIVSCWIN_WARN
 
 
 /*
@@ -18,11 +19,40 @@
  */
 
 scwin_ptr _scwin_create_from_name(char *name, scwin_req_ptr req) {
-
+	if(strncmp(name, "xcb", 3) == 0) {
+		return scwin_create_xcb(req);	
+	}
+	return NULL;
 }
 
 scwin_ptr _scwin_create_from_env(scwin_req_ptr req) {
+	
 
+	if(getenv("DISPLAY")) {
+		return scwin_create_xcb(req);
+	}
+
+	return NULL;
+}
+
+void scwin_destroy(scwin_ptr window) {
+	window->destroy(window);
+}
+
+void scwin_poll_events(scwin_ptr window) {
+	window->poll_event(window);
+}
+
+void scwin_map(scwin_ptr window) {
+	window->start(window);
+}
+
+int scwin_should_close(scwin_ptr window) {
+	return window->close;
+}
+
+void scwin_set_key_press_fn(scwin_ptr window, void *fn) {
+	window->key_event = fn;
 }
 
 scwin_ptr scwin_create(scwin_req_ptr req) {
