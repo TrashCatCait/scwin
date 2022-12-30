@@ -21,7 +21,6 @@ struct egl {
 void draw_fn(void *data) {
 	struct egl *egl = data;
 
-
 	glClearColor(1.0, 0.0, 0.3, 0.8f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	eglSwapBuffers(egl->display, egl->surface);
@@ -84,6 +83,13 @@ int main() {
 		//Any of your code here
 	}
 
+	eglWaitClient();
+	eglDestroySurface(egl->display, egl->surface);
+	eglDestroyContext(egl->display, context);
+	eglTerminate(egl->display);
+	free(egl);
+	//Note this does not destroy any VK or EGL objects you made those
+	//Need to be cleaned up with their respective handles 
 	scwin_destroy(window);
 
 	return 0;

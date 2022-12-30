@@ -73,26 +73,61 @@ void scwin_xcb_client_message(scwin_xcb_ptr xcb, xcb_client_message_event_t *eve
 
 /* 
  * TODO all events
+ * TODO can we maybe create one generic function? 
+ * The only issue would be that key press events have different args
+ * than expose events for example maybe we could pass a void * to all 
+ * events?
  */
 void scwin_xcb_key_press(scwin_xcb_ptr xcb, xcb_key_press_event_t *event) {	
-	if(xcb->impl.key_event) {
-		xcb->impl.key_event(xcb->impl.data);
+	if(xcb->impl.events.key_press_event) {
+		xcb->impl.events.key_press_event(xcb->impl.data);
 	}
 }
 
 void scwin_xcb_expose(scwin_xcb_ptr xcb, xcb_expose_event_t *event) {
-	if(xcb->impl.draw_event) {
-		xcb->impl.draw_event(xcb->impl.data);
+	if(xcb->impl.events.draw_event) {
+		xcb->impl.events.draw_event(xcb->impl.data);
 	}
 }
 
+void scwin_xcb_enter(scwin_xcb_ptr xcb, xcb_enter_notify_event_t *event) {
+	if(xcb->impl.events.enter_event) {
+		xcb->impl.events.enter_event(xcb->impl.data);
+	}
+}
+
+void scwin_xcb_leave(scwin_xcb_ptr xcb, xcb_enter_notify_event_t *event) {
+	if(xcb->impl.events.leave_event) {
+		xcb->impl.events.leave_event(xcb->impl.data);
+	}
+}
+
+
 void scwin_xcb_event(scwin_xcb_ptr xcb, xcb_generic_event_t *event) {
-	switch (event->response_type & 0x7f) {
+	switch (event->response_type & 0x7f) { 
 		case XCB_EXPOSE:
 			scwin_xcb_expose(xcb, (void*)event);
 			break;
 		case XCB_KEY_PRESS: 
 			scwin_xcb_key_press(xcb, (void*)event);
+			break;
+		case XCB_KEY_RELEASE:
+			break;
+		case XCB_ENTER_NOTIFY:
+			scwin_xcb_enter(xcb, (void*)event);
+			break;
+		case XCB_LEAVE_NOTIFY:
+			scwin_xcb_leave(xcb,(void *)event);
+			break;
+		case XCB_CONFIGURE_NOTIFY:
+			break;
+		case XCB_MAP_NOTIFY:
+			break;
+		case XCB_MOTION_NOTIFY:
+			break;
+		case XCB_BUTTON_PRESS:
+			break;
+		case XCB_BUTTON_RELEASE:
 			break;
 		case XCB_CLIENT_MESSAGE:
 			scwin_xcb_client_message(xcb, (void*)event);
@@ -273,7 +308,15 @@ scwin_ptr scwin_create_xcb(scwin_req_ptr req) {
 	scwin_xcb_create_colormap(xcb->connection, xcb->root, xcb->visual_id, &xcb->colormap);
 	
 	window_values[0] = xcb->screen->black_pixel;
-	window_values[1] = XCB_EVENT_MASK_EXPOSURE;
+	window_values[1] = XCB_EVENT_MASK_EXPOSURE |
+		XCB_EVENT_MASK_ENTER_WINDOW | 
+		XCB_EVENT_MASK_LEAVE_WINDOW |
+		XCB_EVENT_MASK_KEY_PRESS |
+		XCB_EVENT_MASK_KEY_RELEASE |
+		XCB_EVENT_MASK_STRUCTURE_NOTIFY | 
+		XCB_EVENT_MASK_POINTER_MOTION |
+		XCB_EVENT_MASK_BUTTON_PRESS | 
+		XCB_EVENT_MASK_BUTTON_RELEASE;
 	window_values[2] = xcb->colormap;
 
 	window_mask = XCB_CW_EVENT_MASK | XCB_CW_BORDER_PIXEL | XCB_CW_COLORMAP;

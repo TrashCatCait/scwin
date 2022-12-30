@@ -52,11 +52,11 @@ int scwin_should_close(scwin_ptr window) {
 }
 
 void scwin_set_key_press_fn(scwin_ptr window, void *fn) {
-	window->key_event = fn;
+	window->events.key_press_event = fn;
 }
 
 void scwin_set_draw_fn(scwin_ptr window, void *fn) {
-	window->draw_event = fn;
+	window->events.draw_event = fn;
 }
 
 void scwin_set_user_data(scwin_ptr window, void *data) {
