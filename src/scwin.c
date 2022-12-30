@@ -59,6 +59,10 @@ void scwin_set_draw_fn(scwin_ptr window, void *fn) {
 	window->draw_event = fn;
 }
 
+void scwin_set_user_data(scwin_ptr window, void *data) {
+	window->data = data;
+}
+
 
 EGLDisplay *scwin_create_egl_display(scwin_ptr window) {
 	return window->scwin_get_egl_display(window);

@@ -76,13 +76,13 @@ void scwin_xcb_client_message(scwin_xcb_ptr xcb, xcb_client_message_event_t *eve
  */
 void scwin_xcb_key_press(scwin_xcb_ptr xcb, xcb_key_press_event_t *event) {	
 	if(xcb->impl.key_event) {
-		xcb->impl.key_event();
+		xcb->impl.key_event(xcb->impl.data);
 	}
 }
 
 void scwin_xcb_expose(scwin_xcb_ptr xcb, xcb_expose_event_t *event) {
 	if(xcb->impl.draw_event) {
-		xcb->impl.draw_event();
+		xcb->impl.draw_event(xcb->impl.data);
 	}
 }
 
@@ -273,13 +273,10 @@ scwin_ptr scwin_create_xcb(scwin_req_ptr req) {
 	scwin_xcb_create_colormap(xcb->connection, xcb->root, xcb->visual_id, &xcb->colormap);
 	
 	window_values[0] = xcb->screen->black_pixel;
-	window_values[1] = xcb->screen->black_pixel;
-	window_values[2] = XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW |
-		XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE |
-		XCB_EVENT_MASK_STRUCTURE_NOTIFY;
-	window_values[3] = xcb->colormap;
+	window_values[1] = XCB_EVENT_MASK_EXPOSURE;
+	window_values[2] = xcb->colormap;
 
-	window_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK | XCB_CW_BORDER_PIXEL | XCB_CW_COLORMAP;
+	window_mask = XCB_CW_EVENT_MASK | XCB_CW_BORDER_PIXEL | XCB_CW_COLORMAP;
 
 	xcb->window = xcb_generate_id(xcb->connection);
 

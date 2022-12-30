@@ -22,6 +22,8 @@ typedef struct scwin scwin_t, *scwin_ptr;
 
 typedef int scwin_result_t;
 
+
+void scwin_set_user_data(scwin_ptr window, void *data);
 scwin_ptr scwin_create(scwin_req_ptr req);
 void scwin_destroy(scwin_ptr window);
 void scwin_poll_events(scwin_ptr window);

@@ -7,21 +7,30 @@
 
 int i = 0;
 
-void key_press() {
+void key_press(void *data) {
 	printf("Key was pressed\n");
 	return;
 }
 
-void draw_frame() {
+
+struct egl {
+	EGLDisplay *display;
+	EGLSurface *surface;
+};
+
+void draw_fn(void *data) {
+	struct egl *egl = data;
+
+
 	glClearColor(1.0, 0.0, 0.3, 0.8f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	i = 1;
+	eglSwapBuffers(egl->display, egl->surface);
 }
 
 int main() {
 	scwin_ptr window = NULL;
-	EGLDisplay *display = NULL;
-	EGLSurface *surface = NULL;
+	struct egl *egl = malloc(sizeof(*egl));
+
 	EGLConfig config;
 	EGLContext context;
 	EGLint count, major, minor;
@@ -46,43 +55,33 @@ int main() {
 	
 	window = scwin_create(NULL);
 
-	context = eglCreateContext(display, config, EGL_NO_CONTEXT, context_attribs);
-	
-	surface = scwin_create_egl_surface(display, config, window, NULL);
-
-	eglMakeCurrent(display, surface, surface, context);
-
 	scwin_map(window);
 
-	display = scwin_create_egl_display(window);
+	egl->display = scwin_create_egl_display(window);
 
-	if(!eglInitialize(display, &major, &minor)) {
+	if(!eglInitialize(egl->display, &major, &minor)) {
 		printf("Failed to init egl\n");
 		return -1;
 	}
 	printf("EGL init %d.%d\n", major, minor);
 
-	if(!eglChooseConfig(display, config_attribs, &config, 1, &count)) {
+	if(!eglChooseConfig(egl->display, config_attribs, &config, 1, &count)) {
 		printf("Failed to choose egl config\n");
 		return -1;
 	}
 	
-	context = eglCreateContext(display, config, EGL_NO_CONTEXT, context_attribs);
+	context = eglCreateContext(egl->display, config, EGL_NO_CONTEXT, context_attribs);
 	
-	surface = scwin_create_egl_surface(display, config, window, NULL);
+	egl->surface = scwin_create_egl_surface(egl->display, config, window, NULL);
 
-	eglMakeCurrent(display, surface, surface, context);
+	eglMakeCurrent(egl->display, egl->surface, egl->surface, context);
 
-
+	scwin_set_user_data(window, egl);
+	scwin_set_draw_fn(window, draw_fn);
 	scwin_set_key_press_fn(window, key_press);
-	scwin_set_draw_fn(window, draw_frame);
 	while(!scwin_should_close(window)) {
 		scwin_poll_events(window);
 		//Any of your code here
-		if(i) {
-			eglSwapBuffers(display, surface);
-			i = 0;
-		}
 	}
 
 	scwin_destroy(window);

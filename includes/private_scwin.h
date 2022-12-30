@@ -25,12 +25,12 @@
 
 struct scwin {
 	int close;
-
+	void *data;
 	void (*start)(scwin_ptr window);
 	void (*destroy)(scwin_ptr window);
 	void (*poll_event)(scwin_ptr window);
-	void (*key_event)();
-	void (*draw_event)();
+	void (*key_event)(void *data);
+	void (*draw_event)(void *data);
 	EGLDisplay *(*scwin_get_egl_display)(scwin_ptr widnow);
 	EGLSurface *(*scwin_create_egl_surface)(EGLDisplay *display, EGLConfig config, scwin_ptr window, const EGLint *attrib_list);
 	VkResult (*scwin_create_vk_surface)(VkInstance instance, scwin_ptr window, VkAllocationCallbacks allocator, VkSurfaceKHR *surface);
