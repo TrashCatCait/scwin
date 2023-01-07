@@ -40,8 +40,8 @@ int main() {
 		EGL_RED_SIZE, 1,
 		EGL_GREEN_SIZE, 1,
 		EGL_BLUE_SIZE, 1,
-		EGL_ALPHA_SIZE, 0,
-		EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+		EGL_ALPHA_SIZE, 1,
+		EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
 		EGL_NONE
 	};
 
@@ -55,7 +55,7 @@ int main() {
 	window = scwin_create(NULL);
 
 	scwin_map(window);
-
+	
 	egl->display = scwin_create_egl_display(window);
 
 	if(!eglInitialize(egl->display, &major, &minor)) {
@@ -70,7 +70,7 @@ int main() {
 	}
 	
 	context = eglCreateContext(egl->display, config, EGL_NO_CONTEXT, context_attribs);
-	
+
 	egl->surface = scwin_create_egl_surface(egl->display, config, window, NULL);
 
 	eglMakeCurrent(egl->display, egl->surface, egl->surface, context);
@@ -83,7 +83,6 @@ int main() {
 		//Any of your code here
 	}
 
-	eglWaitClient();
 	eglDestroySurface(egl->display, egl->surface);
 	eglDestroyContext(egl->display, context);
 	eglTerminate(egl->display);

@@ -27,7 +27,9 @@ typedef struct scwin_events {
 	void (*key_press_event)(void *data);
 	void (*key_release_event)(void *data);
 	void (*resize_event)(void *data);
-	void (*pointer_move)(void *data);
+	void (*pointer_motion)(void *data);
+	void (*pointer_button_click)(void *data);
+	void (*pointer_button_release)(void *data);
 	void (*draw_event)(void *data);
 	void (*enter_event)(void *data);
 	void (*leave_event)(void *data);

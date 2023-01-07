@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <vulkan/vulkan.h>
 #include <EGL/egl.h>
+#include <stdbool.h>
 
 typedef struct scwin_req {
 	uint32_t height;
@@ -10,13 +11,19 @@ typedef struct scwin_req {
 	uint16_t bpp; 
 	char *title; 
 	void *extension; //Reserved but may be used to extend this 
+	
+	/*
+	 * These flags are only used if drm backend is used 
+	 * Wayland and X will just ignore these flags 
+	 */
+	bool no_drm;
+	bool no_tty_switch;
 } scwin_req_t, *scwin_req_ptr;
 
 enum scwin_results {
 	SCWIN_SUCESS = 0,
 	SCWIN_BACKEND_ERROR = 1,
 };
-
 
 typedef struct scwin scwin_t, *scwin_ptr;
 

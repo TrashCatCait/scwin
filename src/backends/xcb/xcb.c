@@ -102,32 +102,66 @@ void scwin_xcb_leave(scwin_xcb_ptr xcb, xcb_enter_notify_event_t *event) {
 	}
 }
 
+void scwin_xcb_configure(scwin_xcb_ptr xcb, xcb_configure_notify_event_t *event) {
+	if(xcb->impl.events.resize_event) {
+		xcb->impl.events.resize_event(xcb->impl.data);
+	}
+}
+
+void scwin_xcb_motion(scwin_xcb_ptr xcb, xcb_motion_notify_event_t *event) {
+	if(xcb->impl.events.pointer_motion) {
+		xcb->impl.events.pointer_motion(xcb->impl.data);
+	}
+}
+
+void scwin_xcb_button_press(scwin_xcb_ptr xcb, xcb_button_press_event_t *event) {
+	if(xcb->impl.events.pointer_button_click) {
+		xcb->impl.events.pointer_motion(xcb->impl.data);
+	}
+}
+
+void scwin_xcb_button_release(scwin_xcb_ptr xcb, xcb_button_release_event_t *event) {
+	if(xcb->impl.events.pointer_button_release) {
+		xcb->impl.events.pointer_button_release(xcb->impl.data);
+	}
+}
+
+void scwin_xcb_key_release(scwin_xcb_ptr xcb, xcb_key_release_event_t *event) {
+	if(xcb->impl.events.key_release_event) {
+		xcb->impl.events.key_release_event(xcb->impl.data);
+	}
+}
 
 void scwin_xcb_event(scwin_xcb_ptr xcb, xcb_generic_event_t *event) {
 	switch (event->response_type & 0x7f) { 
 		case XCB_EXPOSE:
-			scwin_xcb_expose(xcb, (void*)event);
+			scwin_xcb_expose(xcb, (void *)event);
 			break;
 		case XCB_KEY_PRESS: 
-			scwin_xcb_key_press(xcb, (void*)event);
+			scwin_xcb_key_press(xcb, (void *)event);
 			break;
 		case XCB_KEY_RELEASE:
+			scwin_xcb_key_release(xcb, (void *)event);
 			break;
 		case XCB_ENTER_NOTIFY:
-			scwin_xcb_enter(xcb, (void*)event);
+			scwin_xcb_enter(xcb, (void *)event);
 			break;
 		case XCB_LEAVE_NOTIFY:
 			scwin_xcb_leave(xcb,(void *)event);
 			break;
 		case XCB_CONFIGURE_NOTIFY:
+			scwin_xcb_configure(xcb, (void*)event);
 			break;
 		case XCB_MAP_NOTIFY:
 			break;
 		case XCB_MOTION_NOTIFY:
+			scwin_xcb_motion(xcb, (void *)event);
 			break;
 		case XCB_BUTTON_PRESS:
+			scwin_xcb_button_press(xcb, (void *)event);
 			break;
 		case XCB_BUTTON_RELEASE:
+			scwin_xcb_button_release(xcb, (void *)event);
 			break;
 		case XCB_CLIENT_MESSAGE:
 			scwin_xcb_client_message(xcb, (void*)event);
