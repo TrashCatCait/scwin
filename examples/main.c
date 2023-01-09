@@ -1,5 +1,5 @@
 #include <scwin.h>
-
+#include <logger/logger.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <EGL/egl.h>
@@ -27,6 +27,8 @@ void draw_fn(void *data) {
 }
 
 int main() {
+	scwin_logger_set_level(SCWIN_LOGGER_INFO);
+
 	scwin_ptr window = NULL;
 	struct egl *egl = malloc(sizeof(*egl));
 
@@ -53,7 +55,9 @@ int main() {
 
 	
 	window = scwin_create(NULL);
-
+	if(!window) {
+		return 1;
+	}
 	scwin_map(window);
 	
 	egl->display = scwin_create_egl_display(window);

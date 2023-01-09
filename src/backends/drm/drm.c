@@ -51,22 +51,24 @@ typedef struct scwin_drm {
 #include <linux/vt.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
-scwin_ptr scwin_create_drm_backend(scwin_req_ptr req) {
-	int fd = open("/dev/tty2", O_RDWR | O_CLOEXEC);
-	printf("%m\n");
-	ioctl(fd, VT_LOCKSWITCH, 1);
-	printf("%m\n");
-	while(1) {
+void scwin_drm_cleanup(scwin_ptr backend) {
+	scwin_drm_t *drm = (void *)backend;
+	
 
+
+	free(drm);
+}
+
+scwin_ptr scwin_create_drm(scwin_req_ptr req) {
+	scwin_drm_t *drm = calloc(1, sizeof(*drm));
+	if(!drm) {
+		return NULL; 
 	}
-	char *data = NULL;
 
-	data[0] = 'a';
+	
 
-	return NULL;
+	return (void*)drm; 
 }
 
-int main(int argc, char **argv) {
-	scwin_create_drm_backend(NULL);
-}

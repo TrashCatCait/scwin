@@ -32,7 +32,7 @@ scwin_ptr _scwin_create_from_env(scwin_req_ptr req) {
 		return scwin_create_xcb(req);
 	}
 
-	return NULL;
+	return scwin_create_drm(req);
 }
 
 void scwin_destroy(scwin_ptr window) {

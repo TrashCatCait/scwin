@@ -4,4 +4,4 @@
 
 
 
-scwin_ptr scwin_create_drm_backend(scwin_req_ptr req);
+scwin_ptr scwin_create_drm(scwin_req_ptr req);

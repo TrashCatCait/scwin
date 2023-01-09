@@ -1,4 +1,5 @@
 
+#include "logger/logger.h"
 #define VK_USE_PLATFORM_WAYLAND_KHR
 #define VK_USE_PLATFORM_XCB_KHR
 #include <vulkan/vulkan.h>
@@ -299,6 +300,7 @@ scwin_ptr scwin_create_xcb(scwin_req_ptr req) {
 	uint32_t window_mask = 0;
 	uint32_t window_values[4] = { 0 };
 	xcb_generic_error_t *error = NULL;
+	int has_error = 0;
 
 	xcb->impl.destroy = scwin_destroy_xcb;
 	xcb->impl.start = scwin_start_xcb;
@@ -308,10 +310,17 @@ scwin_ptr scwin_create_xcb(scwin_req_ptr req) {
 	xcb->impl.scwin_create_egl_surface = scwin_xcb_create_egl_surface; 
 	xcb->impl.scwin_get_egl_display = scwin_xcb_create_egl_display;
 	xcb->impl.scwin_create_vk_surface = scwin_xcb_create_vk_surface;
-
-
+		
 	xcb->connection = xcb_connect(getenv("DISPLAY"), &preffered_screen);
-	
+	has_error = xcb_connection_has_error(xcb->connection);
+	if(has_error != 0) {
+		scwin_logf(SCWIN_LOGGER_FATAL, "SCWIN: failed to establish XCB Connection:\nXCB error code: %d\n", has_error);
+		xcb_disconnect(xcb->connection);
+		free(xcb);	
+		return NULL;
+	}
+
+
 	setup = xcb_get_setup(xcb->connection);
 
 	scwin_xcb_get_screen(preffered_screen, setup, &xcb->screen);
@@ -364,7 +373,8 @@ scwin_ptr scwin_create_xcb(scwin_req_ptr req) {
 			xcb->visual_id, window_mask, window_values);
 	
 	xcb_change_property(xcb->connection, XCB_PROP_MODE_REPLACE, 
-			xcb->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(xcb->title), xcb->title);
+			xcb->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, 
+			strlen(xcb->title), xcb->title);
 	
 	//Setup WM close messages 
 	xcb_intern_atom_cookie_t wm_proto_cookie = xcb_intern_atom(xcb->connection, 1, 12, "WM_PROTOCOLS");	
