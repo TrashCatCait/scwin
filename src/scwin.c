@@ -5,7 +5,7 @@
 #include <private_scwin.h>
 #include <scwin.h>
 #include <backends/xcb/xcb.h>
-
+#include <backends/wayland/wayland.h>
 
 
 /*
@@ -27,12 +27,15 @@ scwin_ptr _scwin_create_from_name(char *name, scwin_req_ptr req) {
 
 scwin_ptr _scwin_create_from_env(scwin_req_ptr req) {
 	
+	if(getenv("WAYLAND_DISPLAY")) {
+		return scwin_create_wl(req);
+	}
 
 	if(getenv("DISPLAY")) {
 		return scwin_create_xcb(req);
 	}
 
-	return scwin_create_drm(req);
+	return NULL;
 }
 
 void scwin_destroy(scwin_ptr window) {
